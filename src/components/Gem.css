@@ -1,5 +1,4 @@
 .gem {
-  /* Фиксированный маленький размер для мобильных */
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -30,6 +29,18 @@
   background: rgba(255, 255, 255, 0.4);
   pointer-events: none;
   transition: all 0.3s ease;
+}
+
+.gem:hover {
+  transform: scale(1.1);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.4),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 4px 8px rgba(255, 255, 255, 0.4);
+}
+
+.gem:hover::after {
+  transform: scale(1.2);
 }
 
 .gem-selected {
@@ -73,61 +84,64 @@
 
 /* Анимация для удаляемых шариков */
 .gem-removing {
-  animation: removeBall 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: removeBall 0.5s ease-out forwards;
 }
 
 @keyframes removeBall {
   0% {
     transform: scale(1);
     opacity: 1;
-    filter: brightness(1);
   }
   50% {
     transform: scale(1.2);
     opacity: 0.5;
-    filter: brightness(1.3);
   }
   100% {
     transform: scale(0);
     opacity: 0;
-    filter: brightness(0);
   }
 }
 
 /* Анимация для падающих шариков */
 .gem-falling {
-  animation: fallBall 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: fallBall 0.3s ease-out forwards;
 }
 
 @keyframes fallBall {
   0% {
-    transform: translateY(-60px);
     opacity: 0;
+    transform: translateY(-20px);
   }
   100% {
-    transform: translateY(0);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 /* Анимация для новых шариков */
 .gem-new {
-  animation: newBall 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: newBall 0.4s ease-out forwards;
 }
 
 @keyframes newBall {
   0% {
-    transform: scale(0) rotate(0deg);
     opacity: 0;
-  }
-  70% {
-    transform: scale(1.1) rotate(180deg);
-    opacity: 0.8;
+    transform: scale(0.8);
   }
   100% {
-    transform: scale(1) rotate(360deg);
     opacity: 1;
+    transform: scale(1);
   }
+}
+
+/* Стиль для перетаскиваемого шарика */
+.gem-dragging {
+  opacity: 0.8;
+  transform: scale(1.1);
+  z-index: 100;
+  box-shadow: 
+    0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 /* Цвета шариков */
@@ -191,20 +205,6 @@
     width: 32px;
     height: 32px;
   }
-  
-  .board-row {
-    gap: 3px;
-    margin-bottom: 3px;
-  }
-}
-/* Стиль для перетаскиваемого шарика */
-.gem-dragging {
-  opacity: 0.8;
-  transform: scale(1.1);
-  z-index: 100;
-  box-shadow: 
-    0 0 0 3px rgba(255, 255, 255, 0.9),
-    0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 /* Убираем стандартное поведение drag & drop */
@@ -213,5 +213,4 @@
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
-  user-drag: none;
 }

@@ -27,7 +27,6 @@ export const useAnimations = () => {
       swapping: new Set([key1, key2])
     }));
 
-    // Автоматически убираем анимацию через время
     setTimeout(() => {
       setAnimations(prev => ({
         ...prev,

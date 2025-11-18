@@ -25,52 +25,44 @@ const GameBoard: React.FC = () => {
     getSwapDirection
   } = useAnimations();
 
-  // Функция для обработки всех каскадных совпадений с анимациями
+  // Функция для обработки всех каскадных совпадений с умными анимациями
   const processAllMatches = async (currentBoard: BoardType): Promise<{ board: BoardType; scoreAdded: number }> => {
     let board = currentBoard;
     let totalScore = 0;
     let hasMoreMatches = true;
+    let cycleCount = 0;
 
-    while (hasMoreMatches) {
+    while (hasMoreMatches && cycleCount < 10) {
+      cycleCount++;
+      
       const matches = findAllMatches(board);
       
-      if (matches.length > 0) {
-        // Анимация удаления
-        startRemoveAnimation(matches);
-        totalScore += matches.length * 10;
-        
-        // Ждем анимацию удаления
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Обновляем доску (удаляем совпадения)
-        const result = processMatches(board);
-        board = result.newBoard;
-        setBoard([...board]);
-        setScore(prev => prev + matches.length * 10);
-        
-        // Ждем перед падением
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Анимация падения
-        const fallingPositions = board.flatMap((row, rowIndex) => 
-          row.map((_, colIndex) => ({ row: rowIndex, col: colIndex }))
-        );
-        startFallAnimation(fallingPositions);
-        
-        // Ждем анимацию падения
-        await new Promise(resolve => setTimeout(resolve, 600));
-        
-        // Анимация новых фишек
-        const newGemPositions = board.flatMap((row, rowIndex) => 
-          row.map((_, colIndex) => ({ row: rowIndex, col: colIndex }))
-        );
-        startNewGemAnimation(newGemPositions);
-        
-        // Ждем анимацию появления
-        await new Promise(resolve => setTimeout(resolve, 700));
-      } else {
+      if (matches.length === 0) {
         hasMoreMatches = false;
+        break;
       }
+
+      // Анимация ТОЛЬКО для удаляемых фишек
+      startRemoveAnimation(matches);
+      totalScore += matches.length * 10;
+      
+      // Ждем анимацию удаления
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Обновляем доску (удаляем совпадения)
+      const result = processMatches(board);
+      board = result.newBoard;
+      setBoard([...board]);
+      setScore(prev => prev + matches.length * 10);
+      
+      // Ждем перед следующим шагом
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Просто обновляем доску - фишки "упадут" автоматически
+      setBoard([...board]);
+      
+      // Ждем перед следующей проверкой
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
 
     return { board, scoreAdded: totalScore };
@@ -88,7 +80,7 @@ const GameBoard: React.FC = () => {
 
     setIsAnimating(true);
     
-    // Запускаем анимацию обмена
+    // Запускаем анимацию обмена ТОЛЬКО для двух фишек
     startSwapAnimation(from, to);
     
     // Ждем начала анимации
