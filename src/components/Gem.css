@@ -1,15 +1,15 @@
 .gem {
-  /* Динамический размер в зависимости от экрана */
-  width: clamp(35px, 8vw, 50px);
-  height: clamp(35px, 8vw, 50px);
+  /* Фиксированный маленький размер для мобильных */
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   border: 2px solid transparent;
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.3),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
-    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2),
+    inset 0 3px 6px rgba(255, 255, 255, 0.3);
   position: relative;
   display: flex;
   align-items: center;
@@ -32,60 +32,22 @@
   transition: all 0.3s ease;
 }
 
-.gem:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 
-    0 6px 12px rgba(0, 0, 0, 0.4),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.3),
-    inset 0 4px 8px rgba(255, 255, 255, 0.4);
-}
-
-.gem:hover::after {
-  transform: scale(1.2);
-}
-
 .gem-selected {
   border-color: white;
-  transform: scale(1.15) rotate(10deg);
+  transform: scale(1.1);
   box-shadow: 
-    0 0 0 3px rgba(255, 255, 255, 0.8),
-    0 6px 16px rgba(0, 0, 0, 0.4),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.3),
-    inset 0 4px 8px rgba(255, 255, 255, 0.4);
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 
-      0 0 0 3px rgba(255, 255, 255, 0.6),
-      0 6px 16px rgba(0, 0, 0, 0.4),
-      inset 0 -4px 8px rgba(0, 0, 0, 0.3),
-      inset 0 4px 8px rgba(255, 255, 255, 0.4);
-  }
-  50% {
-    box-shadow: 
-      0 0 0 6px rgba(255, 255, 255, 0.3),
-      0 6px 16px rgba(0, 0, 0, 0.4),
-      inset 0 -4px 8px rgba(0, 0, 0, 0.3),
-      inset 0 4px 8px rgba(255, 255, 255, 0.4);
-  }
-  100% {
-    box-shadow: 
-      0 0 0 3px rgba(255, 255, 255, 0.6),
-      0 6px 16px rgba(0, 0, 0, 0.4),
-      inset 0 -4px 8px rgba(0, 0, 0, 0.3),
-      inset 0 4px 8px rgba(255, 255, 255, 0.4);
-  }
+    0 0 0 2px rgba(255, 255, 255, 0.8),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.3),
+    inset 0 3px 6px rgba(255, 255, 255, 0.4);
 }
 
 /* Символ внутри шарика */
 .gem-symbol {
   color: rgba(255, 255, 255, 0.9);
-  font-size: clamp(12px, 3vw, 16px);
+  font-size: 14px;
   font-weight: bold;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Анимация обмена фишками */
@@ -100,7 +62,7 @@
     z-index: 10;
   }
   50% {
-    transform: scale(1.2) translate(var(--swap-dx), var(--swap-dy));
+    transform: scale(1.1) translate(var(--swap-dx), var(--swap-dy));
     z-index: 10;
   }
   100% {
@@ -120,19 +82,10 @@
     opacity: 1;
     filter: brightness(1);
   }
-  20% {
-    transform: scale(1.3);
-    filter: brightness(1.5);
-  }
   50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-    filter: brightness(1.2);
-  }
-  80% {
-    transform: scale(0.8);
-    opacity: 0.3;
-    filter: brightness(0.8);
+    transform: scale(1.2);
+    opacity: 0.5;
+    filter: brightness(1.3);
   }
   100% {
     transform: scale(0);
@@ -143,44 +96,36 @@
 
 /* Анимация для падающих шариков */
 .gem-falling {
-  animation: fallBall 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: fallBall 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 @keyframes fallBall {
   0% {
-    transform: translateY(-100px) scale(0.8);
+    transform: translateY(-60px);
     opacity: 0;
   }
-  50% {
-    transform: translateY(-30px) scale(1.1);
-    opacity: 0.7;
-  }
   100% {
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 
 /* Анимация для новых шариков */
 .gem-new {
-  animation: newBall 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: newBall 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 @keyframes newBall {
   0% {
-    transform: scale(0) rotate(0deg) translateY(-50px);
+    transform: scale(0) rotate(0deg);
     opacity: 0;
   }
-  60% {
-    transform: scale(1.2) rotate(180deg) translateY(10px);
-    opacity: 0.9;
-  }
-  80% {
-    transform: scale(0.95) rotate(300deg) translateY(-5px);
-    opacity: 1;
+  70% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 0.8;
   }
   100% {
-    transform: scale(1) rotate(360deg) translateY(0);
+    transform: scale(1) rotate(360deg);
     opacity: 1;
   }
 }
@@ -208,18 +153,18 @@
 
 /* Стиль для пустого места */
 .gem-empty {
-  width: clamp(35px, 8vw, 50px);
-  height: clamp(35px, 8vw, 50px);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-/* Мобильная оптимизация */
-@media (max-width: 480px) {
+/* Мобильная оптимизация для очень маленьких экранов */
+@media (max-width: 380px) {
   .gem {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
   }
   
   .gem-symbol {
@@ -227,23 +172,46 @@
   }
   
   .gem-empty {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 320px) {
   .gem {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
   }
   
   .gem-symbol {
-    font-size: 10px;
+    font-size: 11px;
   }
   
   .gem-empty {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
   }
+  
+  .board-row {
+    gap: 3px;
+    margin-bottom: 3px;
+  }
+}
+/* Стиль для перетаскиваемого шарика */
+.gem-dragging {
+  opacity: 0.8;
+  transform: scale(1.1);
+  z-index: 100;
+  box-shadow: 
+    0 0 0 3px rgba(255, 255, 255, 0.9),
+    0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Убираем стандартное поведение drag & drop */
+.gem {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
 }

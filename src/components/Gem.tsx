@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Cell, Position } from '../types/game';
 import './Gem.css';
 
@@ -10,11 +10,17 @@ interface GemProps {
   isRemoving?: boolean;
   isFalling?: boolean;
   isNew?: boolean;
+  isDragging?: boolean;
   swapDirection?: { dx: number; dy: number };
+  onMouseDown: (position: Position) => void;
+  onMouseEnter: (position: Position) => void;
+  onMouseUp: () => void;
+  onTouchStart: (e: React.TouchEvent, position: Position) => void;
+  onTouchMove: (e: React.TouchEvent) => void;
+  onTouchEnd: () => void;
   onClick: (position: Position) => void;
 }
 
-// Функция для получения символа по типу фишки
 const getGemSymbol = (type: string): string => {
   const symbols: { [key: string]: string } = {
     red: '♦',
@@ -34,36 +40,18 @@ const Gem: React.FC<GemProps> = ({
   isRemoving = false,
   isFalling = false,
   isNew = false,
+  isDragging = false,
   swapDirection = { dx: 0, dy: 0 },
+  onMouseDown,
+  onMouseEnter,
+  onMouseUp,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
   onClick 
 }) => {
-  const [animationClass, setAnimationClass] = useState('');
-
-  useEffect(() => {
-    if (isSwapping) {
-      setAnimationClass('gem-swapping');
-    } else if (isRemoving) {
-      setAnimationClass('gem-removing');
-    } else if (isFalling) {
-      setAnimationClass('gem-falling');
-    } else if (isNew) {
-      setAnimationClass('gem-new');
-    } else {
-      setAnimationClass('');
-    }
-  }, [isSwapping, isRemoving, isFalling, isNew]);
-
-  const getSwapStyle = () => {
-    if (isSwapping && swapDirection) {
-      return {
-        '--swap-dx': `${swapDirection.dx * 60}px`,
-        '--swap-dy': `${swapDirection.dy * 60}px`,
-      } as React.CSSProperties;
-    }
-    return {};
-  };
-
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (!isRemoving && !isSwapping) {
       onClick(position);
     }
@@ -71,11 +59,24 @@ const Gem: React.FC<GemProps> = ({
 
   return (
     <div 
-      className={`gem gem-${cell.type} ${isSelected ? 'gem-selected' : ''} ${animationClass}`}
+      className={`gem gem-${cell.type} ${isSelected ? 'gem-selected' : ''} ${isDragging ? 'gem-dragging' : ''} ${isSwapping ? 'gem-swapping' : ''} ${isRemoving ? 'gem-removing' : ''} ${isFalling ? 'gem-falling' : ''} ${isNew ? 'gem-new' : ''}`}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onMouseDown(position);
+      }}
+      onMouseEnter={() => onMouseEnter(position)}
+      onMouseUp={onMouseUp}
+      onTouchStart={(e) => onTouchStart(e, position)}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
       onClick={handleClick}
       data-testid={`gem-${position.row}-${position.col}`}
+      data-gem-position={`${position.row}-${position.col}`}
       title={`${cell.type} gem`}
-      style={getSwapStyle()}
+      style={isSwapping ? {
+        '--swap-dx': `${swapDirection.dx * 40}px`,
+        '--swap-dy': `${swapDirection.dy * 40}px`,
+      } as React.CSSProperties : {}}
     >
       <span className="gem-symbol">
         {getGemSymbol(cell.type)}

@@ -3,6 +3,7 @@ import { GameBoard as BoardType, Position } from '../types/game';
 import { createInitialBoard, swapCells, arePositionsEqual } from '../utils/gameUtils';
 import { processMatches, findAllMatches } from '../utils/boardUpdater';
 import { useAnimations } from '../hooks/useAnimations';
+import { useDragDrop } from '../hooks/useDragDrop';
 import Gem from './Gem';
 import './GameBoard.css';
 
@@ -12,7 +13,6 @@ const GameBoard: React.FC = () => {
   const [score, setScore] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Используем хук анимаций
   const {
     startSwapAnimation,
     startRemoveAnimation,
@@ -24,18 +24,6 @@ const GameBoard: React.FC = () => {
     isNew,
     getSwapDirection
   } = useAnimations();
-
-  useEffect(() => {
-    initializeBoard();
-  }, []);
-
-  const initializeBoard = () => {
-    const newBoard = createInitialBoard();
-    setBoard(newBoard);
-    setScore(0);
-    setSelectedCell(null);
-    setIsAnimating(false);
-  };
 
   // Функция для обработки всех каскадных совпадений с анимациями
   const processAllMatches = async (currentBoard: BoardType): Promise<{ board: BoardType; scoreAdded: number }> => {
@@ -63,7 +51,7 @@ const GameBoard: React.FC = () => {
         // Ждем перед падением
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        // Анимация падения (в реальной игре нужно вычислять какие фишки падают)
+        // Анимация падения
         const fallingPositions = board.flatMap((row, rowIndex) => 
           row.map((_, colIndex) => ({ row: rowIndex, col: colIndex }))
         );
@@ -88,7 +76,74 @@ const GameBoard: React.FC = () => {
     return { board, scoreAdded: totalScore };
   };
 
-  const handleCellClick = async (position: Position) => {
+  // Обработчик для свапа через drag & drop или клик
+  const handleSwap = async (from: Position, to: Position) => {
+    if (isAnimating) return;
+    
+    const isAdjacent = 
+      (Math.abs(from.row - to.row) === 1 && from.col === to.col) ||
+      (Math.abs(from.col - to.col) === 1 && from.row === to.row);
+
+    if (!isAdjacent) return;
+
+    setIsAnimating(true);
+    
+    // Запускаем анимацию обмена
+    startSwapAnimation(from, to);
+    
+    // Ждем начала анимации
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Меняем фишки местами
+    const newBoard = swapCells(board, from, to);
+    setBoard([...newBoard]);
+    
+    // Ждем завершения анимации обмена
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    // Проверяем есть ли совпадения после обмена
+    const matches = findAllMatches(newBoard);
+    
+    if (matches.length > 0) {
+      // Есть совпадения - обрабатываем каскад
+      await processAllMatches(newBoard);
+    } else {
+      // Нет совпадений - возвращаем обратно с анимацией
+      await new Promise(resolve => setTimeout(resolve, 300));
+      startSwapAnimation(to, from);
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const revertedBoard = swapCells(newBoard, to, from);
+      setBoard([...revertedBoard]);
+      await new Promise(resolve => setTimeout(resolve, 400));
+    }
+    
+    setSelectedCell(null);
+    setIsAnimating(false);
+  };
+
+  const {
+    dragState,
+    handleMouseDown,
+    handleMouseEnter,
+    handleMouseUp,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd
+  } = useDragDrop(handleSwap);
+
+  useEffect(() => {
+    initializeBoard();
+  }, []);
+
+  const initializeBoard = () => {
+    const newBoard = createInitialBoard();
+    setBoard(newBoard);
+    setScore(0);
+    setSelectedCell(null);
+    setIsAnimating(false);
+  };
+
+  const handleCellClick = (position: Position) => {
     if (isAnimating) return;
     
     if (!selectedCell) {
@@ -101,47 +156,7 @@ const GameBoard: React.FC = () => {
       return;
     }
 
-    const isAdjacent = 
-      (Math.abs(selectedCell.row - position.row) === 1 && selectedCell.col === position.col) ||
-      (Math.abs(selectedCell.col - position.col) === 1 && selectedCell.row === position.row);
-
-    if (isAdjacent) {
-      setIsAnimating(true);
-      
-      // Запускаем анимацию обмена
-      startSwapAnimation(selectedCell, position);
-      
-      // Ждем начала анимации
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Меняем фишки местами
-      const newBoard = swapCells(board, selectedCell, position);
-      setBoard([...newBoard]);
-      
-      // Ждем завершения анимации обмена
-      await new Promise(resolve => setTimeout(resolve, 400));
-      
-      // Проверяем есть ли совпадения после обмена
-      const matches = findAllMatches(newBoard);
-      
-      if (matches.length > 0) {
-        // Есть совпадения - обрабатываем каскад
-        await processAllMatches(newBoard);
-      } else {
-        // Нет совпадений - возвращаем обратно с анимацией
-        await new Promise(resolve => setTimeout(resolve, 300));
-        startSwapAnimation(position, selectedCell);
-        await new Promise(resolve => setTimeout(resolve, 100));
-        const revertedBoard = swapCells(newBoard, position, selectedCell);
-        setBoard([...revertedBoard]);
-        await new Promise(resolve => setTimeout(resolve, 400));
-      }
-      
-      setSelectedCell(null);
-      setIsAnimating(false);
-    } else {
-      setSelectedCell(position);
-    }
+    handleSwap(selectedCell, position);
   };
 
   if (board.length === 0) {
@@ -164,7 +179,12 @@ const GameBoard: React.FC = () => {
         )}
       </div>
       
-      <div className="board">
+      <div 
+        className="board"
+        onMouseLeave={handleMouseUp}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {board.map((row, rowIndex) => (
           <div key={rowIndex} className="board-row">
             {row.map((cell, colIndex) => {
@@ -182,7 +202,14 @@ const GameBoard: React.FC = () => {
                   isRemoving={isRemoving(position)}
                   isFalling={isFalling(position)}
                   isNew={isNew(position)}
+                  isDragging={dragState.isDragging && dragState.startPosition?.row === rowIndex && dragState.startPosition?.col === colIndex}
                   swapDirection={swapDirection}
+                  onMouseDown={handleMouseDown}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseUp={handleMouseUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                   onClick={handleCellClick}
                 />
               );
