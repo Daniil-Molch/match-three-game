@@ -1,10 +1,11 @@
 .gem {
-  width: 50px;
-  height: 50px;
+  /* Динамический размер в зависимости от экрана */
+  width: clamp(35px, 8vw, 50px);
+  height: clamp(35px, 8vw, 50px);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border: 3px solid transparent;
+  border: 2px solid transparent;
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.3),
     inset 0 -4px 8px rgba(0, 0, 0, 0.2),
@@ -14,6 +15,7 @@
   align-items: center;
   justify-content: center;
   transform-origin: center;
+  flex-shrink: 0;
 }
 
 /* Блик для эффекта стеклянного шара */
@@ -46,7 +48,7 @@
   border-color: white;
   transform: scale(1.15) rotate(10deg);
   box-shadow: 
-    0 0 0 4px rgba(255, 255, 255, 0.8),
+    0 0 0 3px rgba(255, 255, 255, 0.8),
     0 6px 16px rgba(0, 0, 0, 0.4),
     inset 0 -4px 8px rgba(0, 0, 0, 0.3),
     inset 0 4px 8px rgba(255, 255, 255, 0.4);
@@ -75,6 +77,15 @@
       inset 0 -4px 8px rgba(0, 0, 0, 0.3),
       inset 0 4px 8px rgba(255, 255, 255, 0.4);
   }
+}
+
+/* Символ внутри шарика */
+.gem-symbol {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(12px, 3vw, 16px);
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
 /* Анимация обмена фишками */
@@ -174,94 +185,65 @@
   }
 }
 
-/* Анимация "подпрыгивания" при появлении */
-.gem-bounce {
-  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-
-@keyframes bounceIn {
-  0% {
-    transform: scale(0.3);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  70% {
-    transform: scale(0.9);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Эффект "свечения" для совпадающих фишек */
-.gem-match-glow {
-  animation: matchGlow 0.8s ease-in-out infinite alternate;
-}
-
-@keyframes matchGlow {
-  0% {
-    filter: brightness(1) drop-shadow(0 0 5px currentColor);
-  }
-  100% {
-    filter: brightness(1.5) drop-shadow(0 0 15px currentColor);
-  }
-}
-
-/* Цвета шариков с улучшенными градиентами */
+/* Цвета шариков */
 .gem-red { 
   background: radial-gradient(circle at 30% 30%, #ff8a8a, #ff5252, #ff0000);
-  --gem-color: #ff0000;
 }
 
 .gem-blue { 
   background: radial-gradient(circle at 30% 30%, #88d3ce, #4ecdc4, #00a8cc);
-  --gem-color: #00a8cc;
 }
 
 .gem-green { 
   background: radial-gradient(circle at 30% 30%, #80ffd3, #06d6a0, #00a86b);
-  --gem-color: #00a86b;
 }
 
 .gem-yellow { 
   background: radial-gradient(circle at 30% 30%, #ffef78, #ffd166, #ffb400);
-  --gem-color: #ffb400;
 }
 
 .gem-purple { 
   background: radial-gradient(circle at 30% 30%, #c78fff, #9d4edd, #7b2cbf);
-  --gem-color: #7b2cbf;
 }
 
-/* Символ внутри шарика */
-.gem-symbol {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  font-weight: bold;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
+/* Стиль для пустого места */
+.gem-empty {
+  width: clamp(35px, 8vw, 50px);
+  height: clamp(35px, 8vw, 50px);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
 }
 
-.gem:hover .gem-symbol {
-  transform: scale(1.2);
-}
-
-.gem-selected .gem-symbol {
-  animation: symbolPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes symbolPulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.9;
+/* Мобильная оптимизация */
+@media (max-width: 480px) {
+  .gem {
+    width: 32px;
+    height: 32px;
   }
-  50% {
-    transform: scale(1.3);
-    opacity: 1;
+  
+  .gem-symbol {
+    font-size: 12px;
+  }
+  
+  .gem-empty {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 360px) {
+  .gem {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .gem-symbol {
+    font-size: 10px;
+  }
+  
+  .gem-empty {
+    width: 28px;
+    height: 28px;
   }
 }
