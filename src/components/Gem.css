@@ -1,0 +1,267 @@
+.gem {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 3px solid transparent;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 4px 8px rgba(255, 255, 255, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+}
+
+/* Блик для эффекта стеклянного шара */
+.gem::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 20%;
+  height: 20%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.gem:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.4),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 4px 8px rgba(255, 255, 255, 0.4);
+}
+
+.gem:hover::after {
+  transform: scale(1.2);
+}
+
+.gem-selected {
+  border-color: white;
+  transform: scale(1.15) rotate(10deg);
+  box-shadow: 
+    0 0 0 4px rgba(255, 255, 255, 0.8),
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 4px 8px rgba(255, 255, 255, 0.4);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 
+      0 0 0 3px rgba(255, 255, 255, 0.6),
+      0 6px 16px rgba(0, 0, 0, 0.4),
+      inset 0 -4px 8px rgba(0, 0, 0, 0.3),
+      inset 0 4px 8px rgba(255, 255, 255, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 6px rgba(255, 255, 255, 0.3),
+      0 6px 16px rgba(0, 0, 0, 0.4),
+      inset 0 -4px 8px rgba(0, 0, 0, 0.3),
+      inset 0 4px 8px rgba(255, 255, 255, 0.4);
+  }
+  100% {
+    box-shadow: 
+      0 0 0 3px rgba(255, 255, 255, 0.6),
+      0 6px 16px rgba(0, 0, 0, 0.4),
+      inset 0 -4px 8px rgba(0, 0, 0, 0.3),
+      inset 0 4px 8px rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* Анимация обмена фишками */
+.gem-swapping {
+  animation: swapAnimation 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+  z-index: 10;
+}
+
+@keyframes swapAnimation {
+  0% {
+    transform: scale(1) translate(0, 0);
+    z-index: 10;
+  }
+  50% {
+    transform: scale(1.2) translate(var(--swap-dx), var(--swap-dy));
+    z-index: 10;
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+    z-index: 1;
+  }
+}
+
+/* Анимация для удаляемых шариков */
+.gem-removing {
+  animation: removeBall 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes removeBall {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  20% {
+    transform: scale(1.3);
+    filter: brightness(1.5);
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+    filter: brightness(1.2);
+  }
+  80% {
+    transform: scale(0.8);
+    opacity: 0.3;
+    filter: brightness(0.8);
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+    filter: brightness(0);
+  }
+}
+
+/* Анимация для падающих шариков */
+.gem-falling {
+  animation: fallBall 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes fallBall {
+  0% {
+    transform: translateY(-100px) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-30px) scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Анимация для новых шариков */
+.gem-new {
+  animation: newBall 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes newBall {
+  0% {
+    transform: scale(0) rotate(0deg) translateY(-50px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2) rotate(180deg) translateY(10px);
+    opacity: 0.9;
+  }
+  80% {
+    transform: scale(0.95) rotate(300deg) translateY(-5px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(360deg) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Анимация "подпрыгивания" при появлении */
+.gem-bounce {
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Эффект "свечения" для совпадающих фишек */
+.gem-match-glow {
+  animation: matchGlow 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes matchGlow {
+  0% {
+    filter: brightness(1) drop-shadow(0 0 5px currentColor);
+  }
+  100% {
+    filter: brightness(1.5) drop-shadow(0 0 15px currentColor);
+  }
+}
+
+/* Цвета шариков с улучшенными градиентами */
+.gem-red { 
+  background: radial-gradient(circle at 30% 30%, #ff8a8a, #ff5252, #ff0000);
+  --gem-color: #ff0000;
+}
+
+.gem-blue { 
+  background: radial-gradient(circle at 30% 30%, #88d3ce, #4ecdc4, #00a8cc);
+  --gem-color: #00a8cc;
+}
+
+.gem-green { 
+  background: radial-gradient(circle at 30% 30%, #80ffd3, #06d6a0, #00a86b);
+  --gem-color: #00a86b;
+}
+
+.gem-yellow { 
+  background: radial-gradient(circle at 30% 30%, #ffef78, #ffd166, #ffb400);
+  --gem-color: #ffb400;
+}
+
+.gem-purple { 
+  background: radial-gradient(circle at 30% 30%, #c78fff, #9d4edd, #7b2cbf);
+  --gem-color: #7b2cbf;
+}
+
+/* Символ внутри шарика */
+.gem-symbol {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.gem:hover .gem-symbol {
+  transform: scale(1.2);
+}
+
+.gem-selected .gem-symbol {
+  animation: symbolPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes symbolPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
