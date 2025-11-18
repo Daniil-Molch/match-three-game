@@ -1,4 +1,4 @@
-import { GameBoard, Cell, GemType } from '../types/game';
+import { GameBoard, Cell } from '../types/game';
 import { GEM_TYPES } from './gameUtils';
 
 // Создаем новую фишку
